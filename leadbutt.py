@@ -108,7 +108,7 @@ def output_results(results, metric, options):
             # get and then sanitize metric name, first copy the unit name from the
             # result to the context to keep the default format happy
             context['Unit'] = result['Unit']
-            metric_name = (formatter % context).replace('/', '.').lower()
+            metric_name = (formatter % context).replace('/', '.')
             line = '{0} {1} {2}\n'.format(
                 metric_name,
                 result[statistic],
