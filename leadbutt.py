@@ -78,12 +78,12 @@ def get_options(config_options, local_options, cli_options):
     * DEFAULT_OPTIONS  hard coded defaults
     """
     options = DEFAULT_OPTIONS.copy()
+    if cli_options is not None:
+        options.update(cli_options)
     if config_options is not None:
         options.update(config_options)
     if local_options is not None:
         options.update(local_options)
-    if cli_options is not None:
-        options.update(cli_options)
     return options
 
 
