@@ -93,7 +93,9 @@ def output_results(results, metric, options):
 
     TODO: add AMPQ support for efficiency
     """
-    formatter = options['Formatter']
+    formatter = options['Formatter'] if 'Formatter' in options else ''
+    formatters = options['Formatters'] if 'Formatters' in options else []
+    formatter.append(formatter)
     context = metric.copy()  # XXX might need to sanitize this
     try:
         context['dimension'] = list(metric['Dimensions'].values())[0]
@@ -108,13 +110,14 @@ def output_results(results, metric, options):
             # get and then sanitize metric name, first copy the unit name from the
             # result to the context to keep the default format happy
             context['Unit'] = result['Unit']
-            metric_name = (formatter % context).replace('/', '.')
-            line = '{0} {1} {2}\n'.format(
-                metric_name,
-                result[statistic],
-                timegm(result['Timestamp'].timetuple()),
-            )
-            sys.stdout.write(line)
+            for formatter in formatters:
+                metric_name = (formatter % context).replace('/', '.')
+                line = '{0} {1} {2}\n'.format(
+                    metric_name,
+                    result[statistic],
+                    timegm(result['Timestamp'].timetuple()),
+                )
+                sys.stdout.write(line)
 
 
 def leadbutt(config_file, cli_options, verbose=False, **kwargs):
