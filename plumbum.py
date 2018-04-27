@@ -237,7 +237,7 @@ def main():
     # get the template first so this can fail before making a network request
     fs_path = os.path.abspath(os.path.dirname(template))
     loader = jinja2.FileSystemLoader(fs_path)
-    jinja2_env = jinja2.Environment(loader=loader)
+    jinja2_env = jinja2.Environment(loader=loader, extensions=["jinja2.ext.do"])
     template = jinja2_env.get_template(os.path.basename(template))
 
     # insure a valid region is set
