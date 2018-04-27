@@ -95,7 +95,7 @@ def output_results(results, metric, options):
     """
     formatter = options['Formatter'] if 'Formatter' in options else ''
     formatters = options['Formatters'] if 'Formatters' in options else []
-    formatter.append(formatter)
+    formatters.append(formatter)
     context = metric.copy()  # XXX might need to sanitize this
     try:
         context['dimension'] = list(metric['Dimensions'].values())[0]
