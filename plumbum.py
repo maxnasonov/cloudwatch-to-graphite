@@ -43,6 +43,7 @@ import boto.elasticache
 import boto.ec2.autoscale
 import boto.kinesis
 import boto.sqs
+import boto3
 import jinja2
 import os.path
 
@@ -229,6 +230,13 @@ list_resources = {
     'emr': list_emr,
 }
 
+def list_dynamodb_indices(region, table_name):
+    boto3.setup_default_session(region_name=region)
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    indices = table.global_secondary_indexes or []
+    return list(map(lambda idx: idx['IndexName'], indices))
+
 
 def main():
 
@@ -238,6 +246,7 @@ def main():
     fs_path = os.path.abspath(os.path.dirname(template))
     loader = jinja2.FileSystemLoader(fs_path)
     jinja2_env = jinja2.Environment(loader=loader, extensions=["jinja2.ext.do"])
+    jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
     template = jinja2_env.get_template(os.path.basename(template))
 
     # insure a valid region is set
