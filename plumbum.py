@@ -257,7 +257,7 @@ def list_rds_clusters(region):
     marker = ''
     while marker != None:
         resp = rds.describe_db_clusters(Marker=marker)
-        marker = resp['Marker'] if 'Marker' in resp['Marker'] else None
+        marker = resp['Marker'] if 'Marker' in resp else None
         rds_clusters += resp['DBClusters']
     return rds_clusters
 
@@ -268,7 +268,7 @@ def list_rds_instances(region):
     marker = ''
     while marker != None:
         resp = rds.describe_db_instances(Marker=marker)
-        marker = resp['Marker'] if 'Marker' in resp['Marker'] else None
+        marker = resp['Marker'] if 'Marker' in resp else None
         rds_instances += resp['DBInstances']
     return rds_instances
 
