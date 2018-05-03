@@ -237,6 +237,40 @@ def list_dynamodb_indices(region, table_name):
     indices = table.global_secondary_indexes or []
     return list(map(lambda idx: idx['IndexName'], indices))
 
+def rds_name_tag_metric_path(region, rds_id):
+    boto3.setup_default_session(region_name=region)
+    sts = boto3.client("sts")
+    account_id = sts.get_caller_identity()["Account"]
+    rds_arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, rds_id)
+    rds = boto3.client('rds')
+    tags = rds.list_tags_for_resource(ResourceName=rds_arn)
+    if 'Name' in tags['TagList']:
+        name_tag_metric_path = '.'.join(tags['TagList']['Name'].split('-')) + '.'
+    else:
+        name_tag_metric_path = ''
+    return name_tag_metric_path
+
+def list_rds_clusters(region):
+    boto3.setup_default_session(region_name=region)
+    rds = boto3.client('rds')
+    rds_clusters = []
+    marker = ''
+    while marker != None:
+        resp = rds.describe_db_clusters(Marker=marker)
+        marker = resp['Marker'] if 'Marker' in resp['Marker'] else None
+        rds_clusters += resp['DBClusters']
+    return rds_clusters
+
+def list_rds_instances(region):
+    boto3.setup_default_session(region_name=region)
+    rds = boto3.client('rds')
+    rds_instances = []
+    marker = ''
+    while marker != None:
+        resp = rds.describe_db_instances(Marker=marker)
+        marker = resp['Marker'] if 'Marker' in resp['Marker'] else None
+        rds_instances += resp['DBInstances']
+    return rds_instances
 
 def main():
 
@@ -247,6 +281,9 @@ def main():
     loader = jinja2.FileSystemLoader(fs_path)
     jinja2_env = jinja2.Environment(loader=loader, extensions=["jinja2.ext.do"])
     jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
+    jinja2_env.globals['list_rds_instances'] = list_rds_instances
+    jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
+    jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     template = jinja2_env.get_template(os.path.basename(template))
 
     # insure a valid region is set

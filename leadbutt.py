@@ -24,6 +24,7 @@ import time
 from docopt import docopt
 import boto.ec2.cloudwatch
 from retrying import retry
+import time
 import yaml
 
 
@@ -111,13 +112,29 @@ def output_results(results, metric, options):
             # result to the context to keep the default format happy
             context['Unit'] = result['Unit']
             for formatter in formatters:
-                metric_name = (formatter % context).replace('/', '.')
-                line = '{0} {1} {2}\n'.format(
-                    metric_name,
-                    result[statistic],
-                    timegm(result['Timestamp'].timetuple()),
-                )
-                sys.stdout.write(line)
+                if len(formatters.split(' ')) == 1: 
+                    metric_name = (formatter % context).replace('/', '.')
+                    line = '{0} {1} {2}\n'.format(
+                        metric_name,
+                        result[statistic],
+                        timegm(result['Timestamp'].timetuple()),
+                    )
+                    sys.stdout.write(line)
+                    # RDS
+                    if context['MetricName'] == 'FreeStorageSpace':
+                        line = '{0} {1} {2}\n'.format(
+                            metric_name = metric_name.replace('FreeStorageSpace', 'TotalStorageSpace'),
+                            str(options['AllocatedStorage']),
+                            timegm(result['Timestamp'].timetuple()),
+                        )
+                        sys.stdout.write(line)
+                        line = '{0} {1} {2}\n'.format(
+                            metric_name = metric_name.replace('FreeStorageSpace', 'FreeStorageSpacePercent'),
+                            metric_name = metric_name.replace('Bytes', 'Percent'),
+                            str(int(int(result[statistic])/int(options['AllocatedStorage'])*100)),
+                            timegm(result['Timestamp'].timetuple()),
+                        )
+                        sys.stdout.write(line)
 
 
 def leadbutt(config_file, cli_options, verbose=False, **kwargs):
