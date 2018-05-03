@@ -112,7 +112,7 @@ def output_results(results, metric, options):
             # result to the context to keep the default format happy
             context['Unit'] = result['Unit']
             for formatter in formatters:
-                if len(formatters.split(' ')) == 1: 
+                if len(formatter.split(' ')) == 1: 
                     metric_name = (formatter % context).replace('/', '.')
                     line = '{0} {1} {2}\n'.format(
                         metric_name,
