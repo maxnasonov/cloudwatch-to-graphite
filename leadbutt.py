@@ -121,7 +121,7 @@ def output_results(results, metric, options):
                     )
                     sys.stdout.write(line)
                     # RDS
-                    if context['MetricName'] == 'FreeStorageSpace':
+                    if context['MetricName'] == 'FreeStorageSpace' and 'AllocatedStorage' in options:
                         metric_name = metric_name.replace('FreeStorageSpace', 'TotalStorageSpace'),
                         line = '{0} {1} {2}\n'.format(
                             metric_name,
