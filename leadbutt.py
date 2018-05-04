@@ -133,7 +133,7 @@ def output_results(results, metric, options):
                         new_metric_name = new_metric_name.replace('Bytes', 'Percent')
                         line = '{0} {1} {2}\n'.format(
                             new_metric_name,
-                            str(int(int(result[statistic])/int(options['AllocatedStorage'])*100)),
+                            str(int(int(result[statistic])/(int(options['AllocatedStorage']) * 1024 * 1024 * 1024)*100)),
                             timegm(result['Timestamp'].timetuple()),
                         )
                         sys.stdout.write(line)
