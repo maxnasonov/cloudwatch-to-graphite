@@ -244,7 +244,7 @@ def rds_name_tag_metric_path(region, rds_id):
     rds_arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, rds_id)
     rds = boto3.client('rds')
     tags = rds.list_tags_for_resource(ResourceName=rds_arn)
-    name_tag = [tags['Value'] for tag in tags['TagList'] if tag['Key'] == 'Name']
+    name_tag = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'Name']
     name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
     return name_tag_metric_path
 
