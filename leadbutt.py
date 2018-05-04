@@ -122,17 +122,17 @@ def output_results(results, metric, options):
                     sys.stdout.write(line)
                     # RDS
                     if context['MetricName'] == 'FreeStorageSpace' and 'AllocatedStorage' in options:
-                        metric_name = metric_name.replace('FreeStorageSpace', 'TotalStorageSpace')
+                        new_metric_name = metric_name.replace('FreeStorageSpace', 'TotalStorageSpace')
                         line = '{0} {1} {2}\n'.format(
-                            metric_name,
+                            new_metric_name,
                             str(int(options['AllocatedStorage']) * 1024 * 1024),
                             timegm(result['Timestamp'].timetuple()),
                         )
                         sys.stdout.write(line)
-                        metric_name = metric_name.replace('FreeStorageSpace', 'FreeStorageSpacePercent')
-                        metric_name = metric_name.replace('Bytes', 'Percent')
+                        new_metric_name = metric_name.replace('FreeStorageSpace', 'FreeStorageSpacePercent')
+                        new_metric_name = new_metric_name.replace('Bytes', 'Percent')
                         line = '{0} {1} {2}\n'.format(
-                            metric_name,
+                            new_metric_name,
                             str(int(int(result[statistic])/int(options['AllocatedStorage'])*100)),
                             timegm(result['Timestamp'].timetuple()),
                         )
