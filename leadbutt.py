@@ -125,7 +125,7 @@ def output_results(results, metric, options):
                         metric_name = metric_name.replace('FreeStorageSpace', 'TotalStorageSpace')
                         line = '{0} {1} {2}\n'.format(
                             metric_name,
-                            str(options['AllocatedStorage']),
+                            str(int(options['AllocatedStorage']) * 1024 * 1024),
                             timegm(result['Timestamp'].timetuple()),
                         )
                         sys.stdout.write(line)
