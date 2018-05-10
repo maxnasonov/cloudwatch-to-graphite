@@ -262,6 +262,14 @@ def rds_name_tag_metric_path(region, rds_id):
     name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
     return name_tag_metric_path
 
+def elb_name_tag_metric_path(region, elb_name):
+    boto3.setup_default_session(region_name=region)
+    elb = boto3.client('elb')
+    tags = elb.describe_tags(LoadBalancerNames=[elb_name])
+    name_tag = [tag['Value'] for tag in tags['TagDescriptions'][0]['Tags'] if tag['Key'] == 'Name']
+    name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
+    return name_tag_metric_path
+
 def list_rds_clusters(region):
     boto3.setup_default_session(region_name=region)
     rds = boto3.client('rds')
@@ -296,6 +304,7 @@ def main():
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
+    jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
     template = jinja2_env.get_template(os.path.basename(template))
 
