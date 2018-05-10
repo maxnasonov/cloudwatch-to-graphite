@@ -155,6 +155,14 @@ def list_elb(region, filter_by_kwargs):
     return lookup(instances, filter_by=filter_by_kwargs)
 
 
+def list_es(region, filter_by_kwargs):
+    boto3.setup_default_session(region_name=region)
+    es = boto3.client('es')
+    resp = es.list_domain_names()
+    domain_names = [domain_name['DomainName'] for domain_name in resp['DomainNames']]
+    return domain_names
+
+
 def list_rds(region, filter_by_kwargs):
     """List all RDS thingys."""
     conn = boto.rds.connect_to_region(region)
@@ -220,6 +228,7 @@ list_resources = {
     'ec2': list_ec2,
     'ebs': list_ebs,
     'elb': list_elb,
+    'es': list_es,
     'rds': list_rds,
     'elasticache': list_elasticache,
     'asg': list_autoscaling_group,
@@ -264,13 +273,6 @@ def list_rds_clusters(region):
         rds_clusters += resp['DBClusters']
     return rds_clusters
 
-def list_es_domain_names(region):
-    boto3.setup_default_session(region_name=region)
-    es = boto3.client('es')
-    resp = es.list_domain_names()
-    domain_names = [domain_name['DomainName'] for domain_name in resp['DomainNames']]
-    return domain_names
-
 def list_rds_instances(region):
     boto3.setup_default_session(region_name=region)
     rds = boto3.client('rds')
@@ -293,7 +295,6 @@ def main():
     jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
-    jinja2_env.globals['list_es_domain_names'] = list_es_domain_names
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
     template = jinja2_env.get_template(os.path.basename(template))
