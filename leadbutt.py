@@ -114,6 +114,10 @@ def output_results(results, metric, options):
             for formatter in formatters:
                 if len(formatter.split(' ')) == 1: 
                     metric_name = (formatter % context).replace('/', '.')
+                    # ELB
+                    if metric['Namespace'] == 'AWS/ELB' and context['MetricName'] == 'Latency':
+                        metric_name = metric_name.replace('Latency', 'Latency_' + context['statistic'])
+
                     line = '{0} {1} {2}\n'.format(
                         metric_name,
                         result[statistic],
