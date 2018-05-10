@@ -237,6 +237,11 @@ def list_dynamodb_indices(region, table_name):
     indices = table.global_secondary_indexes or []
     return list(map(lambda idx: idx['IndexName'], indices))
 
+def get_account_id(region):
+    boto3.setup_default_session(region_name=region)
+    sts = boto3.client("sts")
+    return sts.get_caller_identity()["Account"]
+
 def rds_name_tag_metric_path(region, rds_id):
     boto3.setup_default_session(region_name=region)
     sts = boto3.client("sts")
@@ -258,6 +263,13 @@ def list_rds_clusters(region):
         marker = resp['Marker'] if 'Marker' in resp else None
         rds_clusters += resp['DBClusters']
     return rds_clusters
+
+def list_es_domain_names(region):
+    boto3.setup_default_session(region_name=region)
+    es = boto3.client('es')
+    resp = es.list_domain_names()
+    domain_names = [domain_name['DomainName'] for domain_name in resp['DomainNames']]
+    return domain_names
 
 def list_rds_instances(region):
     boto3.setup_default_session(region_name=region)
@@ -281,7 +293,9 @@ def main():
     jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
+    jinja2_env.globals['list_es_domain_names'] = list_es_domain_names
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
+    jinja2_env.globals['get_account_id'] = get_account_id
     template = jinja2_env.get_template(os.path.basename(template))
 
     # insure a valid region is set
