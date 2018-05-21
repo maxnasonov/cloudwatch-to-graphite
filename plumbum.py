@@ -292,6 +292,17 @@ def list_rds_instances(region):
         rds_instances += resp['DBInstances']
     return rds_instances
 
+def list_elasticache_clusters(region, filter_by_kwargs):
+    """List all ElastiCache Clusters."""
+    conn = boto.elasticache.connect_to_region(region)
+    req = conn.describe_cache_clusters()
+    data = req["DescribeCacheClustersResponse"]["DescribeCacheClustersResult"]["CacheClusters"]
+    if filter_by_kwargs:
+        clusters = [x for x in data if x[filter_by_kwargs.keys()[0]] == filter_by_kwargs.values()[0]]
+    else:
+        clusters = [x for x in data]
+    return clusters
+
 def main():
 
     template, namespace, region, filters, tokens = interpret_options()
@@ -303,6 +314,7 @@ def main():
     jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
+    jinja2_env.globals['list_elasticache_clusters'] = list_elasticache_clusters
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
