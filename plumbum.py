@@ -292,7 +292,7 @@ def list_rds_instances(region):
         rds_instances += resp['DBInstances']
     return rds_instances
 
-def list_elasticache_clusters(region, filter_by_kwargs):
+def list_elasticache_clusters(region):
     """List all ElastiCache Clusters."""
     conn = boto.elasticache.connect_to_region(region)
     req = conn.describe_cache_clusters()
