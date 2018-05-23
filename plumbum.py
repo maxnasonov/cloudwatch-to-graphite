@@ -42,6 +42,7 @@ import boto.rds
 import boto.elasticache
 import boto.ec2.autoscale
 import boto.kinesis
+import boto.redshift
 import boto.sqs
 import boto3
 import jinja2
@@ -223,6 +224,9 @@ def list_emr(region, filter_by_kwargs):
     queues = q_list.clusters
     return lookup(queues, filter_by=filter_by_kwargs)
 
+def none(region, filter_by_kwargs):
+    return []
+
 list_resources = {
     'cloudfront': list_cloudfront,
     'ec2': list_ec2,
@@ -236,7 +240,8 @@ list_resources = {
     'kinesisapp': list_kinesis_applications,
     'dynamodb': list_dynamodb,
     'billing': list_billing,
-    'emr': list_emr,
+    'elasticmapreduce': list_emr,
+    'redshift': none,
 }
 
 def list_dynamodb_indices(region, table_name):
@@ -295,9 +300,23 @@ def list_rds_instances(region):
 def list_elasticache_clusters(region):
     """List all ElastiCache Clusters."""
     conn = boto.elasticache.connect_to_region(region)
-    req = conn.describe_cache_clusters()
-    data = req["DescribeCacheClustersResponse"]["DescribeCacheClustersResult"]["CacheClusters"]
-    clusters = [x for x in data]
+    clusters = []
+    marker = ''
+    while marker != None:
+        resp = conn.describe_cache_clusters(marker=marker, show_cache_node_info=True)
+        marker = resp['Marker'] if 'Marker' in resp else None
+        clusters += resp["DescribeCacheClustersResponse"]["DescribeCacheClustersResult"]["CacheClusters"]
+    return clusters
+
+def list_redshift_clusters(region):
+    """List all Redshift Clusters."""
+    conn = boto.redshift.connect_to_region(region)
+    clusters = []
+    marker = ''
+    while marker != None:
+        resp = conn.describe_clusters(marker=marker)
+        marker = resp['Marker'] if 'Marker' in resp else None
+        clusters += resp['DescribeClustersResponse']['DescribeClustersResult']["Clusters"]
     return clusters
 
 def main():
@@ -311,6 +330,7 @@ def main():
     jinja2_env.globals['list_dynamodb_indices'] = list_dynamodb_indices
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
+    jinja2_env.globals['list_redshift_clusters'] = list_redshift_clusters
     jinja2_env.globals['list_elasticache_clusters'] = list_elasticache_clusters
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
