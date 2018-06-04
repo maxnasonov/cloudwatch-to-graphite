@@ -224,6 +224,7 @@ def list_emr(region, filter_by_kwargs):
     queues = q_list.clusters
     return lookup(queues, filter_by=filter_by_kwargs)
 
+
 def none(region, filter_by_kwargs):
     return []
 
@@ -242,6 +243,7 @@ list_resources = {
     'billing': list_billing,
     'elasticmapreduce': list_emr,
     'redshift': none,
+    'firehose': none,
 }
 
 def list_dynamodb_indices(region, table_name):
@@ -319,6 +321,17 @@ def list_redshift_clusters(region):
         clusters += resp['DescribeClustersResponse']['DescribeClustersResult']["Clusters"]
     return clusters
 
+def list_firehose_delivery_streams(region):
+    boto3.setup_default_session(region_name=region)
+    firehose = boto3.client('firehose')
+    delivery_streams = []
+    hasMoreDeliveryStreams = True
+    while hasMoreDeliveryStreams == True:
+        resp = firehose.list_delivery_streams(Limit=100)
+        hasMoreDeliveryStreams = resp['HasMoreDeliveryStreams']
+        delivery_streams += resp["DeliveryStreamNames"]
+    return delivery_streams
+
 def main():
 
     template, namespace, region, filters, tokens = interpret_options()
@@ -332,6 +345,7 @@ def main():
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
     jinja2_env.globals['list_redshift_clusters'] = list_redshift_clusters
     jinja2_env.globals['list_elasticache_clusters'] = list_elasticache_clusters
+    jinja2_env.globals['list_firehose_delivery_streams'] = list_firehose_delivery_streams
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
