@@ -179,7 +179,8 @@ def leadbutt(config_file, cli_options, verbose=False, **kwargs):
             config_options, metric.get('Options'), cli_options)
         period_local = options['Period'] * 60
         count_local = options['Count']
-        end_time = datetime.datetime.utcnow()
+        shift = options['Shift']
+        end_time = datetime.datetime.utcnow() - datetime.timedelta(seconds=shift)
         start_time = end_time - datetime.timedelta(
             seconds=period_local * count_local)
         # if 'Unit 'is in the config, request only that; else get all units
