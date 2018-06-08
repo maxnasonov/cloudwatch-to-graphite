@@ -338,7 +338,7 @@ def list_s3_buckets(region):
     s3 = boto3.client('s3')
     resp = s3.list_buckets()
     buckets = [bucket['Name'] for bucket in resp['Buckets']]
-    return delivery_streams
+    return buckets
 
 def main():
 
