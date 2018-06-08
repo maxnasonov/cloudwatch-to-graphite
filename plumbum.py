@@ -244,6 +244,7 @@ list_resources = {
     'elasticmapreduce': list_emr,
     'redshift': none,
     'firehose': none,
+    's3': none,
 }
 
 def list_dynamodb_indices(region, table_name):
@@ -332,6 +333,13 @@ def list_firehose_delivery_streams(region):
         delivery_streams += resp["DeliveryStreamNames"]
     return delivery_streams
 
+def list_s3_buckets(region):
+    boto3.setup_default_session(region_name=region)
+    s3 = boto3.client('s3')
+    resp = s3.list_buckets()
+    buckets = [bucket['Name'] for bucket in resp['Buckets']]
+    return delivery_streams
+
 def main():
 
     template, namespace, region, filters, tokens = interpret_options()
@@ -344,6 +352,7 @@ def main():
     jinja2_env.globals['list_rds_instances'] = list_rds_instances
     jinja2_env.globals['list_rds_clusters'] = list_rds_clusters
     jinja2_env.globals['list_redshift_clusters'] = list_redshift_clusters
+    jinja2_env.globals['list_s3_buckets'] = list_s3_buckets
     jinja2_env.globals['list_elasticache_clusters'] = list_elasticache_clusters
     jinja2_env.globals['list_firehose_delivery_streams'] = list_firehose_delivery_streams
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
