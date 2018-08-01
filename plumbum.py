@@ -259,15 +259,32 @@ def get_account_id(region):
     sts = boto3.client("sts")
     return sts.get_caller_identity()["Account"]
 
-def rds_name_tag_metric_path(region, rds_id):
+def get_tag(tags, rm_key, dp_key=None):
+    if dp_key is None:
+        dp_key = rm_key
+    value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'rm:' + rm_key]
+    if len(value) == 0:
+        value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'dp:' + dp_key]
+    if len(value) == 0:
+        value = ''
+    else:
+        value = value[0]
+    return value
+
+def rds_name_tag_metric_path(region, rds_id, resource_type='db'):
     boto3.setup_default_session(region_name=region)
     sts = boto3.client("sts")
     account_id = sts.get_caller_identity()["Account"]
-    rds_arn = "arn:aws:rds:%s:%s:db:%s" % (region, account_id, rds_id)
+    rds_arn = "arn:aws:rds:%s:%s:%s:%s" % (region, account_id, resource_type, rds_id)
     rds = boto3.client('rds')
     tags = rds.list_tags_for_resource(ResourceName=rds_arn)
     name_tag = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'Name']
-    name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
+    mod_env = get_tag(tags, 'env')
+    mod_type = get_tag(tags, 'type', 'stack-id')
+    mod_name = get_tag(tags, 'module', 'module-type')
+    mod_service = get_tag(tags, 'service', 'resource')
+    mod_id = [tag_value for tag_value in [mod_env, mod_type, mod_name, mod_service] if tag_value != '']
+    name_tag_metric_path = '.'.join(mod_id) + '.' if len(mod_id) > 0 else ''
     return name_tag_metric_path
 
 def elb_name_tag_metric_path(region, elb_name):
