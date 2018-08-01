@@ -262,9 +262,9 @@ def get_account_id(region):
 def get_tag(tags, rm_key, dp_key=None):
     if dp_key is None:
         dp_key = rm_key
-    value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'rm:' + rm_key]
+    value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'dp:' + dp_key]
     if len(value) == 0:
-        value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'dp:' + dp_key]
+        value = [tag['Value'] for tag in tags['TagList'] if tag['Key'] == 'rm:' + rm_key]
     if len(value) == 0:
         value = ''
     else:
