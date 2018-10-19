@@ -357,6 +357,17 @@ def list_s3_buckets(region):
     buckets = [bucket['Name'] for bucket in resp['Buckets']]
     return buckets
 
+def list_kinesis_streams(region):
+    boto3.setup_default_session(region_name=region)
+    kinesis = boto3.client('kinesis')
+    streams = []
+    hasMore = True
+    while hasMore == True:
+        resp = kinesis.list_streams(Limit=100)
+        hasMoreDeliveryStreams = resp['HasMoreStreams']
+        treams += resp["StreamNames"]
+    return streams
+
 def main():
 
     template, namespace, region, filters, tokens = interpret_options()
