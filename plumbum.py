@@ -384,6 +384,7 @@ def main():
     jinja2_env.globals['list_s3_buckets'] = list_s3_buckets
     jinja2_env.globals['list_elasticache_clusters'] = list_elasticache_clusters
     jinja2_env.globals['list_firehose_delivery_streams'] = list_firehose_delivery_streams
+    jinja2_env.globals['list_kinesis_streams'] = list_kinesis_streams
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
