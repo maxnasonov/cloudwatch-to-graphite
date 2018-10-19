@@ -366,7 +366,7 @@ def list_kinesis_streams(region):
     while hasMore == True:
         resp = kinesis.list_streams(Limit=100)
         hasMoreDeliveryStreams = resp['HasMoreStreams']
-        treams += resp["StreamNames"]
+        streams += resp["StreamNames"]
     return streams
 
 def main():
