@@ -238,6 +238,7 @@ list_resources = {
     'elasticache': list_elasticache,
     'asg': list_autoscaling_group,
     'sqs': list_sqs,
+    'kinesis': none,
     'kinesisapp': list_kinesis_applications,
     'dynamodb': list_dynamodb,
     'billing': list_billing,
