@@ -155,6 +155,12 @@ def list_elb(region, filter_by_kwargs):
     instances = conn.get_all_load_balancers()
     return lookup(instances, filter_by=filter_by_kwargs)
 
+def list_alb(region, filter_by_kwargs):
+    boto3.setup_default_session(region_name=region)
+    alb = boto3.client('elbv2')
+    resp = alb.describe_load_balancers()
+    alb_names = [lb['LoadBalancerName'] for lb in resp['LoadBalancers']]
+    return alb_names
 
 def list_es(region, filter_by_kwargs):
     boto3.setup_default_session(region_name=region)
@@ -233,6 +239,7 @@ list_resources = {
     'ec2': list_ec2,
     'ebs': list_ebs,
     'elb': list_elb,
+    'alb': list_alb,
     'es': list_es,
     'rds': list_rds,
     'elasticache': list_elasticache,
@@ -292,6 +299,14 @@ def elb_name_tag_metric_path(region, elb_name):
     boto3.setup_default_session(region_name=region)
     elb = boto3.client('elb')
     tags = elb.describe_tags(LoadBalancerNames=[elb_name])
+    name_tag = [tag['Value'] for tag in tags['TagDescriptions'][0]['Tags'] if tag['Key'] == 'Name']
+    name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
+    return name_tag_metric_path
+
+def alb_name_tag_metric_path(region, alb_name):
+    boto3.setup_default_session(region_name=region)
+    alb = boto3.client('elbv2')
+    tags = alb.describe_tags(LoadBalancerNames=[alb_name])
     name_tag = [tag['Value'] for tag in tags['TagDescriptions'][0]['Tags'] if tag['Key'] == 'Name']
     name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
     return name_tag_metric_path
@@ -387,6 +402,7 @@ def main():
     jinja2_env.globals['list_kinesis_streams'] = list_kinesis_streams
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
+    jinja2_env.globals['alb_name_tag_metric_path'] = alb_name_tag_metric_path
     jinja2_env.globals['get_account_id'] = get_account_id
     template = jinja2_env.get_template(os.path.basename(template))
 
