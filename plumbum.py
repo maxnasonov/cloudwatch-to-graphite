@@ -159,8 +159,8 @@ def list_alb(region, filter_by_kwargs):
     boto3.setup_default_session(region_name=region)
     alb = boto3.client('elbv2')
     resp = alb.describe_load_balancers()
-    alb_names = [lb['LoadBalancerName'] for lb in resp['LoadBalancers']]
-    return alb_names
+    albs = [{'name': lb['LoadBalancerName'], 'arn': lb['LoadBalancerArn']} for lb in resp['LoadBalancers']]
+    return albs
 
 def list_es(region, filter_by_kwargs):
     boto3.setup_default_session(region_name=region)
@@ -239,7 +239,7 @@ list_resources = {
     'ec2': list_ec2,
     'ebs': list_ebs,
     'elb': list_elb,
-    'alb': list_alb,
+    'applicationelb': list_alb,
     'es': list_es,
     'rds': list_rds,
     'elasticache': list_elasticache,
