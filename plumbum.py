@@ -306,7 +306,7 @@ def elb_name_tag_metric_path(region, elb_name):
 def alb_name_tag_metric_path(region, alb_name):
     boto3.setup_default_session(region_name=region)
     alb = boto3.client('elbv2')
-    tags = alb.describe_tags(LoadBalancerNames=[alb_name])
+    tags = alb.describe_tags(ResourceArns=[alb_name])
     name_tag = [tag['Value'] for tag in tags['TagDescriptions'][0]['Tags'] if tag['Key'] == 'Name']
     name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
     return name_tag_metric_path
