@@ -315,7 +315,7 @@ def list_alb_target_groups(region, alb_arn):
     boto3.setup_default_session(region_name=region)
     alb = boto3.client('elbv2')
     resp = alb.describe_target_groups(LoadBalancerArn=alb_arn)
-    tgs = [{'arn': lb['TargetGroupArn']} for tg in resp['TargetGroups']]
+    tgs = [{'name': tg['TargetGroupName'], 'arn': tg['TargetGroupArn']} for tg in resp['TargetGroups']]
     return tgs
 
 def list_rds_clusters(region):
