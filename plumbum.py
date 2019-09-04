@@ -311,6 +311,13 @@ def alb_name_tag_metric_path(region, alb_name):
     name_tag_metric_path = '.'.join(name_tag[0].split('-')) + '.' if len(name_tag) > 0 else ''
     return name_tag_metric_path
 
+def list_alb_target_groups(region, alb_arn):
+    boto3.setup_default_session(region_name=region)
+    alb = boto3.client('elbv2')
+    resp = alb.describe_target_groups(LoadBalancerArn=alb_arn)
+    tgs = [{'arn': lb['TargetGroupArn']} for tg in resp['TargetGroups']]
+    return tgs
+
 def list_rds_clusters(region):
     boto3.setup_default_session(region_name=region)
     rds = boto3.client('rds')
@@ -403,6 +410,7 @@ def main():
     jinja2_env.globals['rds_name_tag_metric_path'] = rds_name_tag_metric_path
     jinja2_env.globals['elb_name_tag_metric_path'] = elb_name_tag_metric_path
     jinja2_env.globals['alb_name_tag_metric_path'] = alb_name_tag_metric_path
+    jinja2_env.globals['list_alb_target_groups'] = list_alb_target_groups
     jinja2_env.globals['get_account_id'] = get_account_id
     template = jinja2_env.get_template(os.path.basename(template))
 
